@@ -14,16 +14,24 @@ import { extractedEntitiesToNodeEntities } from './prompts/textExtractors/Entiti
 import { extractedLocationsToNodeLocations } from './prompts/textExtractors/LocationsExtractor';
 import { extractedActionsToEdgeActions } from './prompts/textExtractors/SentenceActionsExtractor';
 
+const DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1";
+
 const hashSplitted = window.location.hash.split("?");
 const search = hashSplitted[hashSplitted.length-1]
 const params = new URLSearchParams(search);
 const key = params.get('k');
 
 let openaiKey = ""
+let openaiBaseUrl = DEFAULT_OPENAI_BASE_URL; // Default OpenAI endpoint
+
 if (!key) {
     if ("VITE_OPENAI_API_KEY" in import.meta.env) {
         openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    } /*else {
+    }
+    if ("VITE_OPENAI_BASE_URL" in import.meta.env) {
+        openaiBaseUrl = import.meta.env.VITE_OPENAI_BASE_URL;
+    }
+    /*else {
         throw new Error("No key provided in the URL parameters");
     }*/
 } else {
@@ -32,6 +40,7 @@ if (!key) {
 
 export const openai = new OpenAI({
     apiKey: openaiKey,
+    baseURL: openaiBaseUrl,
     dangerouslyAllowBrowser: true
 });
 
@@ -89,6 +98,8 @@ export interface ModelState {
     filteredActionsSegment: { start: number, end: number } | null;
 
     highlightedEntities: string[];
+    
+    openAIBaseUrl: string;
 }
 
 interface ModelAction {
@@ -112,6 +123,7 @@ interface ModelAction {
 
     setIsStale: (isStale: boolean) => void;
     setOpenAIKey: (key: string) => void
+    setOpenAIBaseUrl: (baseUrl: string) => void
     setIsReadOnly: (isReadOnly: boolean) => void;
 }
 
@@ -144,7 +156,8 @@ function getInitialState() {
         textActionMatches: TextUtils.matchActionsToText(actionEdges.map((edge) => edge.data!), text),
         textState: initialTextState,
         text: text,
-        isReadOnly: false
+        isReadOnly: false,
+        openAIBaseUrl: DEFAULT_OPENAI_BASE_URL
     }
 
     return initialState;
@@ -293,6 +306,9 @@ export const useModelStore = create<ModelState & ModelAction>()((set, get) => ({
     },
     setOpenAIKey: (key) => {
         openai.apiKey = key;
+      },
+    setOpenAIBaseUrl: (baseUrl) => {
+        openai.baseURL = baseUrl;
       },
     setIsReadOnly: (isReadOnly) => {
         set((state) => ({ isReadOnly: isReadOnly }));
