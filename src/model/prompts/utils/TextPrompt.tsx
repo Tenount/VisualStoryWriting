@@ -1,4 +1,4 @@
-import { openai } from "../../Model";
+import { openai, useModelStore } from "../../Model";
 import { BasePrompt, ExecutablePrompt, PromptResult } from "./BasePrompt";
 
 export class TextPrompt extends BasePrompt<PromptResult<string>> {
@@ -14,10 +14,11 @@ export class TextPrompt extends BasePrompt<PromptResult<string>> {
         return new Promise<PromptResult<string>>((resolve, reject) => {
             
             (async () => {
+                const { openAIModel, openAITemperature } = useModelStore.getState();
                 const stream = await openai.chat.completions.create({
-                  model: this.prompt.model || "gpt-4o-2024-08-06",
+                  model: this.prompt.model || openAIModel,
                   messages: [{ role: 'user', content: this.prompt.prompt }],
-                  temperature: 0,
+                  temperature: openAITemperature,
                   stream: true,
                 });
                 let response = '';

@@ -3,7 +3,7 @@ import { ChatCompletionChunk } from "openai/resources/index.mjs";
 import { Allow, parse } from "partial-json";
 import { ZodObject, z } from "zod";
 import { useStudyStore } from "../../../study/StudyModel";
-import { openai } from "../../Model";
+import { openai, useModelStore } from "../../Model";
 import { BasePrompt, ExecutablePrompt, PromptResult } from "./BasePrompt";
 
 
@@ -75,7 +75,14 @@ export class JSONPrompt<T> extends BasePrompt<PromptResult<T>> {
     return new Promise<PromptResult<T>>((resolve, reject) => {
       (async () => {
         useStudyStore.getState().logEvent("PROMPT_TO_EXECUTE", { prompt: this.prompt.prompt });
+        const { openAIModel, openAITemperature } = useModelStore.getState();
         const stream = await openai.chat.completions.create({
+          model: this.prompt.model || openAIModel,
+          messages: [{ role: 'user', content: this.prompt.prompt }],
+          stream: true,
+          temperature: openAITemperature,
+          response_format: zodResponseFormat(this.schema, "response"),
+        });
           model: this.prompt.model || "gpt-4o-2024-08-06",
           messages: [{ role: 'user', content: this.prompt.prompt }],
           stream: true,
