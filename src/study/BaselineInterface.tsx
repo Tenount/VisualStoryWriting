@@ -58,8 +58,6 @@ export default function BaselineInterface(props: { children?: React.ReactNode })
       const { openAIModel } = useModelStore.getState();
       const stream = await openai.chat.completions.create({
         model: openAIModel || 'gpt-4o',
-      const stream = await openai.chat.completions.create({
-        model: 'gpt-4o',
         messages: messages,
         stream: true,
       });

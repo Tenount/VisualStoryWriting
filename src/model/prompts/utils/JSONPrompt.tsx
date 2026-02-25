@@ -70,7 +70,6 @@ export class JSONPrompt<T> extends BasePrompt<PromptResult<T>> {
   }
 
 
-
   execute(): Promise<PromptResult<T>> {
     return new Promise<PromptResult<T>>((resolve, reject) => {
       (async () => {
@@ -81,12 +80,6 @@ export class JSONPrompt<T> extends BasePrompt<PromptResult<T>> {
           messages: [{ role: 'user', content: this.prompt.prompt }],
           stream: true,
           temperature: openAITemperature,
-          response_format: zodResponseFormat(this.schema, "response"),
-        });
-          model: this.prompt.model || "gpt-4o-2024-08-06",
-          messages: [{ role: 'user', content: this.prompt.prompt }],
-          stream: true,
-          temperature: 0,
           response_format: zodResponseFormat(this.schema, "response"),
         });
 
