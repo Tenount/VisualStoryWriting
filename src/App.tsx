@@ -33,9 +33,9 @@ function App() {
       element: <Launcher />
     }
   ],
-  /*{
+  {
     basename: import.meta.env.BASE_URL
-  }*/
+  }
 );
 
   return (
