@@ -119,11 +119,16 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
           const startPt = SlateUtils.toSlatePoint(useModelStore.getState().textState, start);
           const endPt = SlateUtils.toSlatePoint(useModelStore.getState().textState, end);
           
-          // Validate points have valid paths (non-empty)
-          if (startPt && endPt && startPt.path.length > 0 && endPt.path.length > 0) {
+          // Validate points have valid paths (non-empty) and textState is valid
+          if (!startPt || !endPt || startPt.path.length === 0 || endPt.path.length === 0) continue;
+          if (!useModelStore.getState().textState || useModelStore.getState().textState.length === 0) continue;
+          
+          try {
             const range = { anchor: startPt, focus: endPt };
-
-            const intersection = Range.intersection(range, Editor.range(globalEditor, path));
+            const editorRange = Editor.range(globalEditor, path);
+            if (!editorRange) continue;
+            
+            const intersection = Range.intersection(range, editorRange);
 
             if (intersection) {
               ranges.push({
@@ -132,6 +137,9 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
                 highlight: true,
               } as any);
             }
+          } catch (e) {
+            console.log(e);
+            continue;
           }
         }
       }

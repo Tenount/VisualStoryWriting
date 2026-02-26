@@ -103,7 +103,19 @@ export class JSONPrompt<T> extends BasePrompt<PromptResult<T>> {
         }
         useStudyStore.getState().logEvent("PROMPT_EXECUTED", { prompt: this.prompt.prompt, response: response });
         this.onPartialResponse = null; // Reset the partial response callback     
-        resolve({ result: JSON.parse(response) as T }); // The parsing should now never fail thanks to the new API. So no need for trying to fix / retrying the request by feeding the error anymore
+        
+        // Try to parse the response, fall back to partial result if failed
+        try {
+          resolve({ result: JSON.parse(response) as T });
+        } catch (e) {
+          // If JSON.parse fails, try to use the last valid partial result
+          const partialResult = this.partialParse(response);
+          if (partialResult) {
+            resolve({ result: partialResult });
+          } else {
+            reject(new Error("Failed to parse model response as JSON"));
+          }
+        }
       })();
     });
   }
