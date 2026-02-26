@@ -37,7 +37,8 @@ export class TextUtils {
      * @returns 
      */
     static prepareStringForMatching(str: string, replacement = " "): string {
-        return str.replace(/[^a-zA-Z0-9]/g, replacement).toLocaleLowerCase();
+        // Keep letters, numbers and whitespace from any script (CJK, Arabic, Cyrillic, etc.)
+        return str.replace(/[^a-zA-Z0-9\p{L}\p{N}\s]/gu, replacement).toLocaleLowerCase();
     }
 
     /**
@@ -47,20 +48,27 @@ export class TextUtils {
      * @returns 
      */
     static matchActionsToText(actions : Action[], text: string): TextActionMatch[] {
-        // Simplify the string as much as possible to simplify the matching
-        // Also seems like GPT struggles with preserving special characters and spaces...
-        text = TextUtils.prepareStringForMatching(text);
+        // Use original text for matching - positions must match original text indices
+        const originalText = text;
 
         // Most naive solution, we first match all the passages to the text
         let matches : TextActionMatch[] = [];
         for (const action of actions) {
-            let passage = TextUtils.prepareStringForMatching(action.passage);
-
-            const start = text.indexOf(passage);
+            // Try exact match first on original text
+            const passage = action.passage;
+            const start = originalText.indexOf(passage);
             if (start !== -1) {
                 matches.push({start, end: start + passage.length, action, isExact: true});
             } else {
-                matches.push({start: -1, end: -1, action, isExact: false});
+                // Fall back to case-insensitive match
+                const lowerPassage = passage.toLowerCase();
+                const lowerText = originalText.toLowerCase();
+                const lowerStart = lowerText.indexOf(lowerPassage);
+                if (lowerStart !== -1) {
+                    matches.push({start: lowerStart, end: lowerStart + passage.length, action, isExact: true});
+                } else {
+                    matches.push({start: -1, end: -1, action, isExact: false});
+                }
             }
         }
 
@@ -73,7 +81,7 @@ export class TextUtils {
                 // This passage was not matched yet
                 // We first approximate its position by looking at its neighbors
                 match.start = lastEnd;
-                match.end = text.length;
+                match.end = originalText.length;
 
                 // Refine the endPos by looking at the next passage
                 const closestNextRange = matches.slice(index+1).find((r) => r.start !== null);
@@ -82,7 +90,7 @@ export class TextUtils {
                 }
 
                 // Now we can look for the passage in a narrower passage
-                const textBeingSearched = text.slice(match.start, match.end);
+                const textBeingSearched = originalText.slice(match.start, match.end);
 
                 // We look for the first and last long subsequence in common, and mark those as the start and end
                 let subsequenceIdx = 0;

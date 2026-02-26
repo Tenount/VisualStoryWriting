@@ -22,6 +22,7 @@ export function extractedLocationsToNodeLocations(extractedData: z.infer<typeof 
 
 
 export function LocationExtractor(text : string, center: {x: number, y: number}) : Promise<LocationNode[]> {
+    // isExtracting is managed by VisualWritingInterface
     const prompt = locationsPrompt.replace('{text}', text);
 
     const locationExtractor = new JSONPrompt({ prompt:  prompt}, LOCATION_SCHEMA)
@@ -49,6 +50,8 @@ export function LocationExtractor(text : string, center: {x: number, y: number})
         locationExtractor.execute().then((result) => {
             console.log("Extracted locations:", result.result);
             resolve(useModelStore.getState().locationNodes);
-        })
+        }).catch((e) => {
+            reject(e);
+        });
     });
 }

@@ -2,6 +2,7 @@ import { Button, Tab, Tabs, Tooltip } from '@nextui-org/react';
 import { ReactFlowProvider, useKeyPress } from '@xyflow/react';
 import React, { useEffect, useState } from 'react';
 import { FaTrashAlt } from 'react-icons/fa';
+import { ImCross } from 'react-icons/im';
 import { FaLocationDot } from 'react-icons/fa6';
 import { IoPersonCircle } from 'react-icons/io5';
 import { TbArrowBigLeftLinesFilled, TbArrowBigRightLinesFilled } from 'react-icons/tb';
@@ -21,7 +22,8 @@ import LocationsEditor from './locationView/LocationsEditor';
 
 
 export default function VisualWritingInterface(props: { children?: React.ReactNode }) {
-  const [isExtracting, setIsExtracting] = useState(false);
+  const isExtracting = useModelStore(state => state.isExtracting);
+  const setIsExtracting = useModelStore(state => state.setIsExtracting);
   const [selectedTab, setSelectedTab] = useState('entities');
   const isStale = useModelStore(state => state.isStale);
   const isReadOnly = useModelStore(state => state.isReadOnly);
@@ -126,6 +128,7 @@ export default function VisualWritingInterface(props: { children?: React.ReactNo
                     VisualRefresher.getInstance().refreshFromText(useModelStore.getState().text,
                       () => { },
                       () => {
+                        // This is called after sentence extraction completes - extraction is fully done
                         setIsExtracting(false);
                       });
                   }
@@ -143,7 +146,12 @@ export default function VisualWritingInterface(props: { children?: React.ReactNo
                   if (useModelStore.getState().entityNodes.length === 0) refreshRequirements = entitiesExtractor;
 
                   refreshRequirements.then((response) => {
+                    // Call visualRefreshCallback to start sentence extraction
+                    // This ensures isExtracting stays true until ALL extraction (including sentences) is done
                     visualRefreshCallback();
+                  }).catch((error) => {
+                    console.error("Extraction failed:", error);
+                    setIsExtracting(false);
                   });
                 }}
               >
@@ -160,6 +168,19 @@ export default function VisualWritingInterface(props: { children?: React.ReactNo
                 <TbArrowBigLeftLinesFilled />
               </Button>
             </Tooltip>
+
+            {isExtracting && (
+              <Tooltip content="Stop extraction" closeDelay={0}>
+                <Button style={{ fontSize: 22 }} color="danger" isIconOnly radius={'full'}
+                  onClick={() => {
+                    setIsExtracting(false);
+                    window.location.reload();
+                  }}
+                >
+                  <ImCross />
+                </Button>
+              </Tooltip>
+            )}
 
           </div>}
         </div> 

@@ -23,6 +23,7 @@ export function extractedEntitiesToNodeEntities(extractedData: z.infer<typeof EN
 
 
 export function EntitiesExtractor(text : string, center: {x: number, y: number}) : Promise<EntityNode[]> {
+    // Don't set isExtracting here - let VisualRefresher handle it
     const prompt = entitiesPrompt.replace('{text}', text);
 
     const entityExtractor = new JSONPrompt({ prompt:  prompt}, ENTITY_SCHEMA)
@@ -49,6 +50,8 @@ export function EntitiesExtractor(text : string, center: {x: number, y: number})
         entityExtractor.execute().then((result) => {
             console.log("Extracted entities:", result.result.entities);
             resolve(useModelStore.getState().entityNodes);
-        })
+        }).catch((e) => {
+            reject(e);
+        });
     });
 }

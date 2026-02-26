@@ -72,7 +72,13 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
 
   const activeSelectionDecoration = useCallback(
     ([node, path]: NodeEntry) => {
-      const ranges : Range[] = [];
+      try {
+        // Skip if node is invalid or empty
+        if (!node || (node as any).children === undefined || (node as any).children.length === 0) {
+          return ranges;
+        }
+        
+        const ranges : Range[] = [];
       let idsToDecorate : number[] = [];
 
       if (selectedEdges.length > 0) {
@@ -119,6 +125,10 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
           // Validate textState is valid before calling toSlatePoint
           const textState = useModelStore.getState().textState;
           if (!textState || textState.length === 0) continue;
+          
+          // Validate textState has valid children with text
+          const hasValidContent = textState.some((node: any) => node.children && node.children.some((child: any) => child.text));
+          if (!hasValidContent) continue;
   
           const startPt = SlateUtils.toSlatePoint(textState, start);
           const endPt = SlateUtils.toSlatePoint(textState, end);
@@ -148,7 +158,11 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
       }
 
       return ranges;
-    },
+    } catch (e) {
+      // Return empty ranges on any error
+      return [];
+    }
+  },
     [textActionMatches, filteredActionsSegment, highlightedActionsSegment, selectedEdges, selectedNodes, highlightedEntities]
   )
 
@@ -162,19 +176,35 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
         }
       }} className={textIsBeingEdited ? "loading" : ""} style={{ position: 'relative', background: 'white', height: '100%', width: '50%', paddingTop: 60, paddingLeft: 50, paddingRight: 50, borderRadius: '2px', boxShadow: '0 0 10px rgba(0,0,0,0.1)', overflow: 'scroll' }}>
         <Slate onSelectionChange={(selection) => {
+          console.log("onSelectionChange:", { selection, isReadOnly });
           if (!isReadOnly && selection) {
+            // Validate editor has content
+            if (!globalEditor.children || globalEditor.children.length === 0) return;
+            
             const startPoint = selection?.anchor;
             const endPoint = selection?.focus;
+            
+            // Validate points exist
+            if (!startPoint || !endPoint) return;
 
-            const startIndex = SlateUtils.toStrIndex(globalEditor.children, startPoint);
-            const endIndex = SlateUtils.toStrIndex(globalEditor.children, endPoint);
+            try {
+              const startIndex = SlateUtils.toStrIndex(globalEditor.children, startPoint);
+              const endIndex = SlateUtils.toStrIndex(globalEditor.children, endPoint);
 
-            const actions = TextUtils.getActionsAtPosition(useModelStore.getState().textActionMatches, Math.min(startIndex, endIndex), Math.max(startIndex, endIndex), true);
+              console.log("Selection change:", { startIndex, endIndex, textActionMatchesLength: useModelStore.getState().textActionMatches.length });
 
-            if (actions.length > 0) {
-              useModelStore.getState().setFilteredActionsSegment(actions[0].index, actions[actions.length - 1].index);
-            } else {
-              useModelStore.getState().setFilteredActionsSegment(null, null);
+              const actions = TextUtils.getActionsAtPosition(useModelStore.getState().textActionMatches, Math.min(startIndex, endIndex), Math.max(startIndex, endIndex), true);
+
+              console.log("Found actions:", actions);
+
+              if (actions.length > 0) {
+                useModelStore.getState().setFilteredActionsSegment(actions[0].index, actions[actions.length - 1].index);
+              } else {
+                useModelStore.getState().setFilteredActionsSegment(null, null);
+              }
+            } catch (e) {
+              console.error("Selection change error:", e);
+              // Ignore errors in selection change handler
             }
           }
 
@@ -216,7 +246,7 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
           }} renderLeaf={renderLeaf} />
         </Slate>
 
-        {isTextSuggested && <div style={{ position: 'absolute', top: 10, transform: 'translate(-50%, 0)', left: '50%' }}>
+        {isTextSuggested && <div style={{ position: 'absolute', top: 10, transform: 'translate(-50%, 0)', left: '50%', display: 'flex', gap: '10px' }}>
           <Button size="sm" variant='faded' style={{marginRight: 5}} onClick={() => useModelStore.getState().acceptSuggestions()}><FaCheck /> Accept changes</Button>
           <Button size="sm" variant='faded' onClick={() => useModelStore.getState().rejectSuggestions()} ><ImCross /> Reject changes</Button>
         </div>}

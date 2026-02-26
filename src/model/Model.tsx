@@ -115,6 +115,7 @@ export interface ModelState {
     openAIBaseUrl: string;
     openAIModel: string;
     openAITemperature: number;
+    isExtracting: boolean;
 }
 
 interface ModelAction {
@@ -142,6 +143,7 @@ interface ModelAction {
     setOpenAIModel: (model: string) => void
     setOpenAITemperature: (temperature: number) => void
     setIsReadOnly: (isReadOnly: boolean) => void;
+    setIsExtracting: (isExtracting: boolean) => void;
 }
 
 
@@ -176,7 +178,8 @@ function getInitialState() {
         isReadOnly: false,
         openAIBaseUrl: openaiBaseUrl,
         openAIModel: openaiModel,
-        openAITemperature: openaiTemperature
+        openAITemperature: openaiTemperature,
+        isExtracting: false
     }
 
     return initialState;
@@ -337,5 +340,9 @@ export const useModelStore = create<ModelState & ModelAction>()((set, get) => ({
       },
     setIsReadOnly: (isReadOnly) => {
         set((state) => ({ isReadOnly: isReadOnly }));
+    },
+    setIsExtracting: (isExtracting) => {
+        console.log("setIsExtracting called:", isExtracting);
+        set((state) => ({ isExtracting: isExtracting }));
     }
 }))

@@ -12,7 +12,7 @@ export class SlateUtils {
      */
     static toSlatePoint(node : any, strIndex : number, startStrIndex = 0, isLast = false) : Point | null {
         // Guard against empty or invalid nodes
-        if (!node || (node.children !== undefined && node.children.length === 0)) {
+        if (!node || (node.children !== undefined && node.children.length === 0) || (node.text !== undefined && !node.text)) {
             return null;
         }
         
