@@ -96,6 +96,14 @@ export class VisualRefresher {
             return prompt
         });
 
+        // If no sentences to process, resolve immediately
+        if (actionPromises.length === 0) {
+            if (onFinished) onFinished();
+            this.onRefreshDone();
+            this.previousText = text;
+            return;
+        }
+
         new ParallelPrompts(actionPromises).execute().then((results) => {
             const actions = useModelStore.getState().actionEdges.map((actionEdge) => {
                 const sourceEntity = useModelStore.getState().entityNodes.find(entity => entity.id === actionEdge.source);

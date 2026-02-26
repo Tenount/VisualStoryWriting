@@ -110,6 +110,9 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
       if (idsToDecorate.length > 0) {
 
         for (const i of idsToDecorate) {
+          // Skip if index is out of bounds
+          if (i < 0 || i >= textActionMatches.length) continue;
+
           const start = textActionMatches[i].start;
           const end = textActionMatches[i].end;
   

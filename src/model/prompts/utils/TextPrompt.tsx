@@ -1,5 +1,7 @@
-import { openai, useModelStore } from "../../Model";
+import { openai, useModelStore, isOpenAIConfigured } from "../../Model";
 import { BasePrompt, ExecutablePrompt, PromptResult } from "./BasePrompt";
+
+const ERROR_NOT_CONFIGURED = "OpenAI is not configured. Please set VITE_OPENAI_BASE_URL, VITE_OPENAI_MODEL, and API key in .env or URL.";
 
 export class TextPrompt extends BasePrompt<PromptResult<string>> {
     prompt: ExecutablePrompt;
@@ -14,6 +16,12 @@ export class TextPrompt extends BasePrompt<PromptResult<string>> {
         return new Promise<PromptResult<string>>((resolve, reject) => {
             
             (async () => {
+                if (!isOpenAIConfigured()) {
+                    console.error(ERROR_NOT_CONFIGURED);
+                    reject(new Error(ERROR_NOT_CONFIGURED));
+                    return;
+                }
+
                 const { openAIModel, openAITemperature } = useModelStore.getState();
                 const stream = await openai.chat.completions.create({
                   model: this.prompt.model || openAIModel,

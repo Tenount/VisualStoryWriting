@@ -1,10 +1,11 @@
 import { zodResponseFormat } from 'openai/helpers/zod';
-import { ChatCompletionChunk } from "openai/resources/index.mjs";
 import { Allow, parse } from "partial-json";
 import { ZodObject, z } from "zod";
 import { useStudyStore } from "../../../study/StudyModel";
-import { openai, useModelStore } from "../../Model";
+import { openai, useModelStore, isOpenAIConfigured } from "../../Model";
 import { BasePrompt, ExecutablePrompt, PromptResult } from "./BasePrompt";
+
+const ERROR_NOT_CONFIGURED = "OpenAI is not configured. Please set VITE_OPENAI_BASE_URL, VITE_OPENAI_MODEL, and API key in .env or URL";
 
 
 export class JSONPrompt<T> extends BasePrompt<PromptResult<T>> {
@@ -73,6 +74,12 @@ export class JSONPrompt<T> extends BasePrompt<PromptResult<T>> {
   execute(): Promise<PromptResult<T>> {
     return new Promise<PromptResult<T>>((resolve, reject) => {
       (async () => {
+        if (!isOpenAIConfigured()) {
+          console.error(ERROR_NOT_CONFIGURED);
+          reject(new Error(ERROR_NOT_CONFIGURED));
+          return;
+        }
+
         useStudyStore.getState().logEvent("PROMPT_TO_EXECUTE", { prompt: this.prompt.prompt });
         const { openAIModel, openAITemperature } = useModelStore.getState();
         const stream = await openai.chat.completions.create({

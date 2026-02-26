@@ -14,34 +14,44 @@ import { extractedEntitiesToNodeEntities } from './prompts/textExtractors/Entiti
 import { extractedLocationsToNodeLocations } from './prompts/textExtractors/LocationsExtractor';
 import { extractedActionsToEdgeActions } from './prompts/textExtractors/SentenceActionsExtractor';
 
-const DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1";
-const DEFAULT_OPENAI_TEMPERATURE = 0;
-
 const hashSplitted = window.location.hash.split("?");
 const search = hashSplitted[hashSplitted.length-1];
 const params = new URLSearchParams(search);
 const key = params.get('k');
 
 let openaiKey = "";
-let openaiBaseUrl = DEFAULT_OPENAI_BASE_URL;
+let openaiBaseUrl = "";
 let openaiModel = ""; // Required: must set VITE_OPENAI_MODEL
-let openaiTemperature = DEFAULT_OPENAI_TEMPERATURE;
+let openaiTemperature = 0.2;
 
 if (!key) {
-    if ("VITE_OPENAI_API_KEY" in import.meta.env) {
-        openaiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    console.log("No key in URL, checking .env");
+    const envKey = import.meta.env.VITE_OPENAI_API_KEY;
+    const envBaseUrl = import.meta.env.VITE_OPENAI_BASE_URL;
+    const envModel = import.meta.env.VITE_OPENAI_MODEL;
+    console.log("env vars:", { envKey: !!envKey, envBaseUrl, envModel });
+    
+    if (envKey) {
+        openaiKey = envKey;
     }
-    if ("VITE_OPENAI_BASE_URL" in import.meta.env) {
-        openaiBaseUrl = import.meta.env.VITE_OPENAI_BASE_URL;
+    if (envBaseUrl) {
+        openaiBaseUrl = envBaseUrl;
     }
-    if ("VITE_OPENAI_MODEL" in import.meta.env) {
-        openaiModel = import.meta.env.VITE_OPENAI_MODEL;
+    if (envModel) {
+        openaiModel = envModel;
     }
-    if ("VITE_OPENAI_TEMPERATURE" in import.meta.env) {
+    if (import.meta.env.VITE_OPENAI_TEMPERATURE !== undefined) {
         openaiTemperature = Number(import.meta.env.VITE_OPENAI_TEMPERATURE);
     }
 } else {
     openaiKey = atob(key);
+}
+
+console.log("Final config:", { openaiBaseUrl, openaiModel, openaiKey: openaiKey ? "set" : "not set" });
+
+// Validation: ensure configuration is set
+if (!openaiBaseUrl || !openaiModel) {
+    console.error("OpenAI configuration error: VITE_OPENAI_BASE_URL and VITE_OPENAI_MODEL must be set");
 }
 
 export const openai = new OpenAI({
@@ -49,6 +59,11 @@ export const openai = new OpenAI({
     baseURL: openaiBaseUrl,
     dangerouslyAllowBrowser: true
 });
+
+// Helper to check if OpenAI is properly configured
+export function isOpenAIConfigured(): boolean {
+    return !!(openaiKey && openaiBaseUrl && openaiModel);
+}
 
 export interface EntityProperty {
     name: string
