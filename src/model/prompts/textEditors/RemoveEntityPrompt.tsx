@@ -1,5 +1,5 @@
 import { useStudyStore } from "../../../study/StudyModel";
-import { Entity } from "../../Model";
+import { Entity } from "../../schemas";
 import { TargettedTextEditPrompt } from "./TargettedTextEdit";
 
 export class RemoveEntityPrompt extends TargettedTextEditPrompt {

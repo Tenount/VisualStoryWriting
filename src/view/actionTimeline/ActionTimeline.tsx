@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Slider } from '@nextui-org/react';
 import '@xyflow/react/dist/style.css';
 import { GrNext, GrPrevious } from 'react-icons/gr';
-import { ActionEdge, EntityNode, useModelStore } from '../../model/Model';
+import { ActionEdge, EntityNode } from '../../model/schemas';
+import { useModelStore } from '../../model/Model';
 import { ReorderActionPrompt } from '../../model/prompts/textEditors/ReorderActionPrompt';
 import { useStudyStore } from '../../study/StudyModel';
 

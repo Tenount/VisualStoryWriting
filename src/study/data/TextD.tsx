@@ -1,4 +1,4 @@
-import { Entity, Location } from "../../model/Model";
+import { Action, Entity, Location } from "../../model/schemas";
 
 export const textD = `Anna sat on the beach, watching the waves crash against the shore. The wind blew her hair around, but she didn’t mind. She loved the sound of the ocean. It helped her forget her worries, at least for a little while. She had been thinking about her brother, David, who lived far away. They hadn’t spoken in weeks, and she missed him.
 
@@ -6,7 +6,7 @@ David was in the city, sitting at his desk, staring at his computer. He was tire
 
 Meanwhile, their friend Emma was in the mountains, hiking up a trail. She loved the peacefulness of nature. The trees were tall, and the air was fresh. As she reached the top of the hill, she thought about Anna and David. They used to do everything together, but now they were all in different places. She hoped they could reunite soon, even if just for a little while.`
 
-export const dataTextD : {locations: Location[], entities: Entity[], actions: any[]} = {
+export const dataTextD : {locations: Location[], entities: Entity[],     actions: Action[]} = {
     locations: [
         {
           "name": "Beach",

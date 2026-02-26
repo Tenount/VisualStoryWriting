@@ -1,5 +1,6 @@
 import { useStudyStore } from "../../../study/StudyModel";
-import { ActionEdge, useModelStore } from "../../Model";
+import { ActionEdge } from "../../schemas";
+import { useModelStore } from "../../Model";
 import { TextEditPrompt } from "./TextEditPrompt";
 
 export class RewriteFromVisual extends TextEditPrompt {

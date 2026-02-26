@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { ActionEdge, Entity, useModelStore } from "../../Model";
+import { ActionEdge, Entity } from "../../schemas";
+import { useModelStore } from "../../Model";
 import { JSONPrompt } from "../utils/JSONPrompt";
 import { CreateActionEdge } from "./SentenceActionsExtractor";
 

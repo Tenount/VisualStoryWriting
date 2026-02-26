@@ -14,6 +14,9 @@ import { extractedEntitiesToNodeEntities } from './prompts/textExtractors/Entiti
 import { extractedLocationsToNodeLocations } from './prompts/textExtractors/LocationsExtractor';
 import { extractedActionsToEdgeActions } from './prompts/textExtractors/SentenceActionsExtractor';
 
+// Import types from SSOT
+import type { EntityNode, ActionEdge, LocationNode, HardcodedStudyData } from './schemas';
+
 const hashSplitted = window.location.hash.split("?");
 const search = hashSplitted[hashSplitted.length-1];
 const params = new URLSearchParams(search);
@@ -57,31 +60,7 @@ export function isOpenAIConfigured(): boolean {
     return !!(openaiKey && openaiBaseUrl && openaiModel);
 }
 
-export interface EntityProperty {
-    name: string
-    value: number
-}
-
-export type Entity = {
-    name: string
-    emoji: string
-    properties: EntityProperty[]
-}
-export type EntityNode = Node<Entity>;
-
-export type Action = {
-    name: string
-    sourceLocation: string
-    targetLocation: string
-    passage: string
-}
-export type ActionEdge = Edge<Action>;
-
-export type Location = {
-    name: string
-    emoji: string
-}
-export type LocationNode = Node<Location>;
+// SSOT: EntityProperty, Entity, Action, Location types are imported from schemas.ts
 
 const hardcodedText = `Anna sat on the beach, watching the waves crash against the shore. The wind blew her hair around, but she didn't mind. She loved the sound of the ocean. It helped her forget her worries, at least for a little while. She had been thinking about her brother, David, who lived far away. They hadn't spoken in weeks, and she missed him.
 

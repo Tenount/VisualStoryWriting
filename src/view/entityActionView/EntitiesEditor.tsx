@@ -3,7 +3,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import '@xyflow/react/dist/style.css';
 import { LayoutUtils } from '../../model/LayoutUtils';
-import { ActionEdge, useModelStore } from '../../model/Model';
+import { ActionEdge } from '../../model/schemas';
+import { useModelStore } from '../../model/Model';
 import { AddActionPrompt } from '../../model/prompts/textEditors/AddActionPrompt';
 import ActionEdgeComponent from './ActionEdgeComponent';
 import EntityNodeComponent, { CreateEntityNode } from './EntityNodeComponent';

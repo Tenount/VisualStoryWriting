@@ -1,5 +1,6 @@
 import { useStudyStore } from "../../../study/StudyModel";
-import { Entity, useModelStore } from "../../Model";
+import { Entity } from "../../schemas";
+import { useModelStore } from "../../Model";
 import { TextEditPrompt } from "./TextEditPrompt";
 
 export class ChangePropertyPrompt extends TextEditPrompt {

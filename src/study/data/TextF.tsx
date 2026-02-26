@@ -1,4 +1,4 @@
-import { Entity, Location } from "../../model/Model";
+import { Action, Entity, Location } from "../../model/schemas";
 
 
 export const textF = `The reflection of the half moon danced on the rough waters of the Gulf of Mexico. Waves crashed against the rocky shore of Laguna Madre causing an ominous tower of white foam to rain down in a striking demonstration of the battle between sea and space. High tides had already swallowed the entirety of South Padre Island as a result of the exceptional gravitational pull of the black hole. Most had fled further inland in the forlorn hope of surviving the certain end of the world. But Mona and her father, Joseph, opted to surrender to the inevitable, and if time was kind, catch one final sunrise. 
@@ -18,7 +18,7 @@ export const textF = `The reflection of the half moon danced on the rough waters
        "Just a few more moments..."\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n`;
 
 
-export const dataTextF : {locations: Location[], entities: Entity[], actions: any[]} = {
+export const dataTextF : {locations: Location[], entities: Entity[],     actions: Action[]} = {
   entities: [
     /*{
         "name": "Gulf of Mexico",

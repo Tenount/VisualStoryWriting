@@ -1,8 +1,8 @@
-import { Entity, Location } from "../../model/Model";
+import { Action, Entity, Location } from "../../model/schemas";
 
 export const textC = `Every winter, geese fly long distances and trade the freezing temperatures of the north for the warmth of the south. Robert was one of such geese and, as a goose, Robert doesn't ask many questions... But what is a human doing flying in the sky beside him?`
 
-export const dataTextC : {locations: Location[], entities: Entity[], actions: any[]} = {
+export const dataTextC : {locations: Location[], entities: Entity[],     actions: Action[]} = {
     locations: [
         {
             "name": "Open Skies",

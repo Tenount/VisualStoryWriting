@@ -1,5 +1,6 @@
 import { useStudyStore } from "../../../study/StudyModel";
-import { Action, ActionEdge, useModelStore } from "../../Model";
+import { Action, ActionEdge } from "../../schemas";
+import { useModelStore } from "../../Model";
 import { TextEditPrompt } from "./TextEditPrompt";
 
 export class ReorderActionPrompt extends TextEditPrompt {

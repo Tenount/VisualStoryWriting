@@ -1,4 +1,4 @@
-import { Entity, Location } from "../../model/Model";
+import { Action, Entity, Location } from "../../model/schemas";
 
 export const textB = `One snowy winter morning, Jack jumped up and looked out his window to see the world covered in thick sparkling snow. Perfect sledding snow!
 
@@ -14,7 +14,7 @@ He zoomed past the parents waiting at the bottom of the hill. But he didn't slow
 He zoomed faster and faster, and crashed into the hay bales.
 He flew off his sled and into the air. He soared through the sky, flying past a flock of noisy geese.`
 
-export const dataTextB : {locations: Location[], entities: Entity[], actions: any[]} = {
+export const dataTextB : {locations: Location[], entities: Entity[],     actions: Action[]} = {
     locations: [
         {
             "name": "Jack's House",

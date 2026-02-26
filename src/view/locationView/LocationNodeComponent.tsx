@@ -2,7 +2,8 @@ import { NodeProps, useKeyPress } from '@xyflow/react';
 import { useEffect } from 'react';
 
 import '@xyflow/react/dist/style.css';
-import { Location, LocationNode, useModelStore } from '../../model/Model';
+import { Location, LocationNode } from '../../model/schemas';
+import { useModelStore } from '../../model/Model';
 import { useViewModelStore } from '../../model/ViewModel';
 
 

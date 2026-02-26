@@ -1,4 +1,4 @@
-import { Entity, Location } from "../../model/Model";
+import { Action, Entity, Location } from "../../model/schemas";
 
 export const textA = `Julia sat at a small table outside the café stirring her coffee absentmindedly. The young waitress clumsily cleared the table next to her, making her remember when she was the young ambitious waitress who just moved to the big city. She wondered where this young waitress came from and what the gossip amongst the staff of this café was.
 Sam’s alarm blared at full volume through her phone speakers. As she reached her arm out to press snooze for the third time, she suddenly remembered. The pounding of her heart grew louder and louder as she peeked at her phone – 10:05.
@@ -18,7 +18,7 @@ She pulled out her phone, looking at Sam’s text from 30 minutes ago.
  
 At 10:55, Julia sighed and took a sip of her second cup of lukewarm coffee. She could picture Sam running out her door, hair all over, panicking while checking the time. Julia tried not to be annoyed but this was not the first time. Or the second. She leaned back in her chair, debating whether to order breakfast alone or wait a little longer. Across the street, Sam sees Julia sitting at the front of the café.`
 
-export const dataTextA : {locations: Location[], entities: Entity[], actions: any[]} = {
+export const dataTextA : {locations: Location[], entities: Entity[],     actions: Action[]} = {
     locations: [
         {
             "name": "Café",

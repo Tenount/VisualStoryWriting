@@ -5,7 +5,8 @@ import entitiesVideo from '/videos/Entities.mp4';
 import locationsVideo from '/videos/Locations.mp4';
 import reorderVideo from '/videos/Reorder.mp4';
 
-import { Entity, Location, ModelState } from '../model/Model';
+import { Action, Entity, HardcodedStudyData, Location } from '../model/schemas';
+import { ModelState } from '../model/Model';
 import { dataTextB, textB } from './data/TextB';
 import { dataTextC, textC } from './data/TextC';
 
@@ -26,7 +27,7 @@ export interface StudyStep {
     task: StudyTask;
     condition: StudyCondition;
     saveData?: boolean;
-    hardcodedData?: {actions: any[], entities: Entity[], locations: Location[]};
+    hardcodedData?: HardcodedStudyData;
 }
 
 

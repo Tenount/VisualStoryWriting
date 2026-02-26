@@ -1,5 +1,5 @@
 import { useStudyStore } from "../../../study/StudyModel";
-import { Action, Entity } from "../../Model";
+import { Action, Entity } from "../../schemas";
 import { TargettedTextEditPrompt } from "./TargettedTextEdit";
 
 export class RemoveActionPrompt extends TargettedTextEditPrompt {

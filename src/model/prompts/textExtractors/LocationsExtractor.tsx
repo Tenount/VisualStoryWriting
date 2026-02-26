@@ -1,22 +1,14 @@
 import { z } from "zod";
 import { CreateLocatioNode } from "../../../view/locationView/LocationNodeComponent";
 import { LayoutUtils } from "../../LayoutUtils";
-import { LocationNode, useModelStore } from "../../Model";
+import { LocationNode, LocationResponseSchema } from "../../schemas";
+import { useModelStore } from "../../Model";
 import { JSONPrompt } from "../utils/JSONPrompt";
 import locationsPrompt from '../locations.md?raw';
 
-const LOCATION_SCHEMA = z.object({
-    locations: z.array(z.object({
-        name: z.string(),
-        emoji: z.string(),
-        /*properties: z.array(z.object({
-            name: z.string(),
-            value: z.number()
-        }))*/
-    }))
-});
+// Using LocationSchema from SSOT
 
-export function extractedLocationsToNodeLocations(extractedData: z.infer<typeof LOCATION_SCHEMA>) : LocationNode[] {
+export function extractedLocationsToNodeLocations(extractedData: z.infer<typeof LocationResponseSchema>) : LocationNode[] {
     return extractedData.locations.map((location, index) => CreateLocatioNode(location, index)); 
 }
 
@@ -25,7 +17,7 @@ export function LocationExtractor(text : string, center: {x: number, y: number})
     // isExtracting is managed by VisualWritingInterface
     const prompt = locationsPrompt.replace('{text}', text);
 
-    const locationExtractor = new JSONPrompt({ prompt:  prompt}, LOCATION_SCHEMA)
+    const locationExtractor = new JSONPrompt({ prompt:  prompt}, LocationResponseSchema)
     useModelStore.getState().setLocationNodes([]);
 
     locationExtractor.onPartialResponse = (partialResult) => {

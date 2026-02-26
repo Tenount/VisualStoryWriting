@@ -1,5 +1,5 @@
 import * as Diff from 'diff';
-import { Action } from "./Model";
+import { Action } from "./schemas";
 
 export interface TextActionMatch {
     action: Action;

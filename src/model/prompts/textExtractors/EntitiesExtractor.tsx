@@ -1,23 +1,15 @@
 import { z } from "zod";
 import { CreateEntityNode } from "../../../view/entityActionView/EntityNodeComponent";
 import { LayoutUtils } from "../../LayoutUtils";
-import { EntityNode, useModelStore } from "../../Model";
+import { EntityNode, EntityResponseSchema } from "../../schemas";
+import { useModelStore } from "../../Model";
 import { JSONPrompt } from "../utils/JSONPrompt";
 import entitiesPrompt from '../entities.md?raw';
 
-const ENTITY_SCHEMA = z.object({
-    entities: z.array(z.object({
-        name: z.string(),
-        emoji: z.string(),
-        properties: z.array(z.object({
-            name: z.string(),
-            value: z.number()
-        }))
-    }))
-});
+// Using EntitySchema from SSOT
 
 
-export function extractedEntitiesToNodeEntities(extractedData: z.infer<typeof ENTITY_SCHEMA>) : EntityNode[] {
+export function extractedEntitiesToNodeEntities(extractedData: z.infer<typeof EntityResponseSchema>) : EntityNode[] {
     return extractedData.entities.map((entity, index) => CreateEntityNode(entity, index)); 
 }
 
@@ -26,7 +18,7 @@ export function EntitiesExtractor(text : string, center: {x: number, y: number})
     // Don't set isExtracting here - let VisualRefresher handle it
     const prompt = entitiesPrompt.replace('{text}', text);
 
-    const entityExtractor = new JSONPrompt({ prompt:  prompt}, ENTITY_SCHEMA)
+    const entityExtractor = new JSONPrompt({ prompt:  prompt}, EntityResponseSchema)
     useModelStore.getState().setEntityNodes([]);
 
     entityExtractor.onPartialResponse = (partialResult) => {

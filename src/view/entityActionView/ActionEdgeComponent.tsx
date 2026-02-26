@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 
 import '@xyflow/react/dist/style.css';
 import { GrFormNext, GrFormPrevious } from 'react-icons/gr';
-import { ActionEdge, useModelStore } from '../../model/Model';
+import { ActionEdge } from '../../model/schemas';
+import { useModelStore } from '../../model/Model';
 import { ChangeActionPrompt } from '../../model/prompts/textEditors/ChangeActionPrompt';
 import { RemoveActionPrompt } from '../../model/prompts/textEditors/RemoveActionPrompt';
 

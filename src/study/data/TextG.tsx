@@ -1,4 +1,4 @@
-import { Entity, Location } from "../../model/Model";
+import { Action, Entity, Location } from "../../model/schemas";
 
 
 export const textG = `        Little Angie never slept at night. Her parents worried. "Insomnia," the doctors said. "Is she anxious?" they asked.
@@ -22,7 +22,7 @@ export const textG = `        Little Angie never slept at night. Her parents wor
 \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n`;
 
 
-export const dataTextG : {locations: Location[], entities: Entity[], actions: any[]} = {
+export const dataTextG : {locations: Location[], entities: Entity[],     actions: Action[]} = {
   entities: [
     {
         "name": "Angie's Door",

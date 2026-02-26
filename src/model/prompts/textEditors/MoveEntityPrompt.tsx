@@ -1,6 +1,7 @@
 import { useStudyStore } from "../../../study/StudyModel";
 import { SpatialEntity } from "../../../view/locationView/LocationsEditor";
-import { Location, useModelStore } from "../../Model";
+import { Location } from "../../schemas";
+import { useModelStore } from "../../Model";
 import { TargettedTextEditPrompt } from "./TargettedTextEdit";
 
 export class MoveEntityPrompt extends TargettedTextEditPrompt {

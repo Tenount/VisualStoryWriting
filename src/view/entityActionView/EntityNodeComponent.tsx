@@ -3,7 +3,8 @@ import { useCallback, useEffect } from 'react';
 
 import { Slider } from '@nextui-org/react';
 import '@xyflow/react/dist/style.css';
-import { Entity, EntityNode, useModelStore } from '../../model/Model';
+import { Entity, EntityNode } from '../../model/schemas';
+import { useModelStore } from '../../model/Model';
 import { ChangePropertyPrompt } from '../../model/prompts/textEditors/ChangePropertyPrompt';
 import { RemoveEntityPrompt } from '../../model/prompts/textEditors/RemoveEntityPrompt';
 

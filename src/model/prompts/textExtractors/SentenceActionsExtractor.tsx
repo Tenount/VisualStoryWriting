@@ -2,22 +2,16 @@ import { MarkerType } from "@xyflow/react";
 import { z } from "zod";
 import { CreateEntityNode } from "../../../view/entityActionView/EntityNodeComponent";
 import { CreateLocatioNode } from "../../../view/locationView/LocationNodeComponent";
-import { ActionEdge, EntityNode, LocationNode, useModelStore } from "../../Model";
+import { ActionEdge, ActionResponseSchema, EntityNode, LocationNode } from "../../schemas";
+import { useModelStore } from "../../Model";
 import { PromptResult } from "../utils/BasePrompt";
 import { JSONExtractorPrompt } from "./JSONExtractorPrompt";
 import actionsPrompt from '../actions.md?raw';
 
 
-const SCHEMA = z.object({
-    actions: z.array(z.object({
-        name: z.string(),
-        source: z.string(),
-        target: z.string(),
-        location: z.string()
-    }))
-});
+// Using ActionSchema from SSOT - includes 'passage' field
 
-export function CreateActionEdge(action: z.infer<typeof SCHEMA>["actions"][0], passage: string, source: EntityNode, target: EntityNode): ActionEdge {
+export function CreateActionEdge(action: z.infer<typeof ActionResponseSchema>, passage: string, source: EntityNode, target: EntityNode): ActionEdge {
     return {
         id: "action-" + source.id + "-" + action.name + "-" + target.id,
         type: "actionEdge",
@@ -32,7 +26,7 @@ export function CreateActionEdge(action: z.infer<typeof SCHEMA>["actions"][0], p
     }
 }
 
-export function extractedActionsToEdgeActions(extractedData: z.infer<typeof SCHEMA>, passage: string, entities: EntityNode[]) : ActionEdge[] {
+export function extractedActionsToEdgeActions(extractedData: z.infer<typeof ActionResponseSchema>, passage: string, entities: EntityNode[]) : ActionEdge[] {
     const edges: ActionEdge[] = [];
 
         // Turn the entities into a dictionary to make it easy to fetch
@@ -60,13 +54,13 @@ export function extractedActionsToEdgeActions(extractedData: z.infer<typeof SCHE
         return edges;
 }
 
-export function extractedActionsToLocations(extractedData: z.infer<typeof SCHEMA>) : LocationNode[] {
+export function extractedActionsToLocations(extractedData: z.infer<typeof ActionResponseSchema>) : LocationNode[] {
     const locations = [...new Set(extractedData.actions.map((action) => action.location))];
 
     return locations.map((location, index) => CreateLocatioNode({name: location, emoji: ""}, index));
 }
 
-export class SentenceActionsExtractor extends JSONExtractorPrompt<z.infer<typeof SCHEMA>> {
+export class SentenceActionsExtractor extends JSONExtractorPrompt<z.infer<typeof ActionResponseSchema>> {
     textBefore: string;
     textToExtract: string;
     textAfter: string;
@@ -95,11 +89,11 @@ export class SentenceActionsExtractor extends JSONExtractorPrompt<z.infer<typeof
         return prompt;
     }
 
-    getJSONSchema(): z.ZodType<z.infer<typeof SCHEMA>> {
-        return SCHEMA;
+    getJSONSchema(): z.ZodType<z.infer<typeof ActionResponseSchema>> {
+        return ActionResponseSchema;
     }
 
-    onPartialResult(partialResult: PromptResult<z.infer<typeof SCHEMA>>): void {
+    onPartialResult(partialResult: PromptResult<z.infer<typeof ActionResponseSchema>>): void {
         const actionEdges = useModelStore.getState().actionEdges;
         const entities = useModelStore.getState().entityNodes;
         const locations = useModelStore.getState().locationNodes;
