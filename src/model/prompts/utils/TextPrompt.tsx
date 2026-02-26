@@ -1,7 +1,7 @@
 import { openai, useModelStore, isOpenAIConfigured } from "../../Model";
 import { BasePrompt, ExecutablePrompt, PromptResult } from "./BasePrompt";
 
-const ERROR_NOT_CONFIGURED = "OpenAI is not configured. Please set VITE_OPENAI_BASE_URL, VITE_OPENAI_MODEL, and API key in .env or URL.";
+const ERROR_NOT_CONFIGURED = "OpenAI is not configured. Please set OPENAI_BASE_URL, OPENAI_MODEL, and API key in .env or URL.";
 
 export class TextPrompt extends BasePrompt<PromptResult<string>> {
     prompt: ExecutablePrompt;

@@ -9,5 +9,6 @@ export default defineConfig({
     sourcemap: false,
     outDir: 'build',
     minify: 'esbuild',
-  }
+  },
+  envPrefix: ['VITE_', 'OPENAI_'],
 })

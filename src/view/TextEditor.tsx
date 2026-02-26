@@ -119,7 +119,8 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
           const startPt = SlateUtils.toSlatePoint(useModelStore.getState().textState, start);
           const endPt = SlateUtils.toSlatePoint(useModelStore.getState().textState, end);
           
-          if (startPt && endPt) {
+          // Validate points have valid paths (non-empty)
+          if (startPt && endPt && startPt.path.length > 0 && endPt.path.length > 0) {
             const range = { anchor: startPt, focus: endPt };
 
             const intersection = Range.intersection(range, Editor.range(globalEditor, path));

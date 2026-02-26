@@ -113,7 +113,7 @@ export class SentenceActionsExtractor extends JSONExtractorPrompt<z.infer<typeof
             const isInBefore = words.some((word) => this.textBefore.toLowerCase().includes(word));
             const isInText = words.some((word) => this.textToExtract.toLowerCase().includes(word));
             if (!isInText && isInBefore) {
-                console.log("Ignoring action because it does not seem to be from the passage: ", {action: action, passage: this.textToExtract});
+                // Ignoring action - debug log removed to reduce spam
                 return false; // Definitely not an action from TEXT
             }
             return true;
@@ -153,7 +153,7 @@ export class SentenceActionsExtractor extends JSONExtractorPrompt<z.infer<typeof
             newEntities.forEach((entityName) => { 
                 const newEntity = CreateEntityNode({name: entityName, emoji: "", properties: []}, entities.length);
                 entities.push(newEntity);
-                console.log("New entity: ", entityName, "because of actions: ", newActions);
+                // New entity debug log removed
                 //TODO: Get an emoji as well as some properties for that new entity
             });
             if (newEntities.length > 0) useModelStore.getState().setEntityNodes(entities);

@@ -21,37 +21,29 @@ const key = params.get('k');
 
 let openaiKey = "";
 let openaiBaseUrl = "";
-let openaiModel = ""; // Required: must set VITE_OPENAI_MODEL
+let openaiModel = ""; // Required: must set OPENAI_MODEL
 let openaiTemperature = 0.2;
 
-if (!key) {
+// Always read baseUrl and model from env
+const envBaseUrl = import.meta.env.OPENAI_BASE_URL;
+const envModel = import.meta.env.OPENAI_MODEL;
+if (envBaseUrl) openaiBaseUrl = envBaseUrl;
+if (envModel) openaiModel = envModel;
+if (import.meta.env.OPENAI_TEMPERATURE !== undefined) {
+    openaiTemperature = Number(import.meta.env.OPENAI_TEMPERATURE);
+}
+
+// Read key from URL if present, otherwise from env
+if (key) {
+    console.log("Key in URL, using it");
+    openaiKey = atob(key);
+} else {
     console.log("No key in URL, checking .env");
-    const envKey = import.meta.env.VITE_OPENAI_API_KEY;
-    const envBaseUrl = import.meta.env.VITE_OPENAI_BASE_URL;
-    const envModel = import.meta.env.VITE_OPENAI_MODEL;
+    const envKey = import.meta.env.OPENAI_API_KEY;
     console.log("env vars:", { envKey: !!envKey, envBaseUrl, envModel });
-    
     if (envKey) {
         openaiKey = envKey;
     }
-    if (envBaseUrl) {
-        openaiBaseUrl = envBaseUrl;
-    }
-    if (envModel) {
-        openaiModel = envModel;
-    }
-    if (import.meta.env.VITE_OPENAI_TEMPERATURE !== undefined) {
-        openaiTemperature = Number(import.meta.env.VITE_OPENAI_TEMPERATURE);
-    }
-} else {
-    openaiKey = atob(key);
-}
-
-console.log("Final config:", { openaiBaseUrl, openaiModel, openaiKey: openaiKey ? "set" : "not set" });
-
-// Validation: ensure configuration is set
-if (!openaiBaseUrl || !openaiModel) {
-    console.error("OpenAI configuration error: VITE_OPENAI_BASE_URL and VITE_OPENAI_MODEL must be set");
 }
 
 export const openai = new OpenAI({

@@ -10,7 +10,7 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - VITE_OPENAI_BASE_URL=http://localhost:8000/v1
-      - VITE_OPENAI_MODEL=Jan-v2-VL-high-Q8_0
-      - VITE_OPENAI_API_KEY=no-need
+      - OPENAI_BASE_URL=http://localhost:8000/v1
+      - OPENAI_MODEL=Jan-v2-VL-high-Q8_0
+      - OPENAI_API_KEY=no-need
     command: npm run dev -- --host
