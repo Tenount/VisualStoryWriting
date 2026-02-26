@@ -11,6 +11,11 @@ export class SlateUtils {
      * @returns 
      */
     static toSlatePoint(node : any, strIndex : number, startStrIndex = 0, isLast = false) : Point | null {
+        // Guard against empty or invalid nodes
+        if (!node || (node.children !== undefined && node.children.length === 0)) {
+            return null;
+        }
+        
         if (node.text !== undefined) {
             if (!node.removed && ((isLast && startStrIndex + node.text.length >= strIndex) || startStrIndex + node.text.length > strIndex)) {
                 return { path: [], offset: strIndex - startStrIndex };
@@ -42,6 +47,11 @@ export class SlateUtils {
      * @returns 
      */
     static toStrIndex(state : Node[], point : Point) : number {
+        // Guard against empty or invalid state
+        if (!state || state.length === 0 || !point || !point.path) {
+            return 0;
+        }
+        
         const texts = Node.texts({children: state} as any, {from: [0, 0], to: point.path})
         let strIndex = 0;
 

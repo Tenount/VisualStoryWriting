@@ -115,13 +115,16 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
 
           const start = textActionMatches[i].start;
           const end = textActionMatches[i].end;
-  
-          const startPt = SlateUtils.toSlatePoint(useModelStore.getState().textState, start);
-          const endPt = SlateUtils.toSlatePoint(useModelStore.getState().textState, end);
           
-          // Validate points have valid paths (non-empty) and textState is valid
+          // Validate textState is valid before calling toSlatePoint
+          const textState = useModelStore.getState().textState;
+          if (!textState || textState.length === 0) continue;
+  
+          const startPt = SlateUtils.toSlatePoint(textState, start);
+          const endPt = SlateUtils.toSlatePoint(textState, end);
+          
+          // Validate points have valid paths (non-empty)
           if (!startPt || !endPt || startPt.path.length === 0 || endPt.path.length === 0) continue;
-          if (!useModelStore.getState().textState || useModelStore.getState().textState.length === 0) continue;
           
           try {
             const range = { anchor: startPt, focus: endPt };
@@ -187,9 +190,14 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
           }}
           onMouseMove={(e) => {
             if (!overlayOnHover) return;
+            // Validate editor has content
+            if (!globalEditor.children || globalEditor.children.length === 0) return;
+            
             // Get the index of the character under the mouse
             const pos = TextUtils.caretPositionFromPoint(e.clientX, e.clientY);
-            if (pos) {
+            if (!pos) return;
+            
+            try {
               const slatePoint = ReactEditor.toSlatePoint(globalEditor, [pos.offsetNode, pos.offset], { exactMatch: true, suppressThrow: true });
 
               if (slatePoint) {
@@ -202,6 +210,8 @@ export default function TextEditor({overlayOnHover = true} : {overlayOnHover?: b
                   useModelStore.getState().setHighlightedActionsSegment(null, null);
                 }
               }
+            } catch (e) {
+              // Ignore errors on mouse move
             }
           }} renderLeaf={renderLeaf} />
         </Slate>
