@@ -3,6 +3,7 @@ import { CreateLocatioNode } from "../../../view/locationView/LocationNodeCompon
 import { LayoutUtils } from "../../LayoutUtils";
 import { LocationNode, useModelStore } from "../../Model";
 import { JSONPrompt } from "../utils/JSONPrompt";
+import locationsPrompt from '../locations.md?raw';
 
 const LOCATION_SCHEMA = z.object({
     locations: z.array(z.object({
@@ -20,12 +21,8 @@ export function extractedLocationsToNodeLocations(extractedData: z.infer<typeof 
 }
 
 
-
 export function LocationExtractor(text : string, center: {x: number, y: number}) : Promise<LocationNode[]> {
-    const prompt = text + 
-    `\n\nExtract all the main locations visited by the characters in this story.` +
-    `For each location, extract its 'name' and an emoji best visually representing the location`
-
+    const prompt = locationsPrompt.replace('{text}', text);
 
     const locationExtractor = new JSONPrompt({ prompt:  prompt}, LOCATION_SCHEMA)
     useModelStore.getState().setLocationNodes([]);
@@ -52,6 +49,6 @@ export function LocationExtractor(text : string, center: {x: number, y: number})
         locationExtractor.execute().then((result) => {
             console.log("Extracted locations:", result.result);
             resolve(useModelStore.getState().locationNodes);
-    })
+        })
     });
 }

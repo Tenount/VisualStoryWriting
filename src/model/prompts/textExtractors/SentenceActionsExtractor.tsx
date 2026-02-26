@@ -5,6 +5,7 @@ import { CreateLocatioNode } from "../../../view/locationView/LocationNodeCompon
 import { ActionEdge, EntityNode, LocationNode, useModelStore } from "../../Model";
 import { PromptResult } from "../utils/BasePrompt";
 import { JSONExtractorPrompt } from "./JSONExtractorPrompt";
+import actionsPrompt from '../actions.md?raw';
 
 
 const SCHEMA = z.object({
@@ -83,17 +84,15 @@ export class SentenceActionsExtractor extends JSONExtractorPrompt<z.infer<typeof
     getPrompt(): string {
         const entitiesStr = this.entities.map(e => e.data.name).join(", ");
         const locationsStr = useModelStore.getState().locationNodes.map(e => e.data.name).join(", ");
-        return (this.textBefore.length === 0 ? "" : `BEFORE: ${this.textBefore}\n\n`) + //AFTER: ${this.textAfter}\n\n` +
-        `TEXT: ${this.textToExtract}\n\n` + 
-        `Extract the actions done by the characters in TEXT and only the actions in TEXT. Do not extract the actions from BEFORE. ` +
-        `Only consider actions that are happening exactly at the moment of TEXT, ignore memories etc. ` +
-        `If there are no actions fulfilling these criterias in TEXT, then return an empty array. ` +
-        `Source and target should be characters from this list: ${entitiesStr}. ` +
-        `Here are some possible locations but there might be others: ${locationsStr}. ` +
-        `If an action is done by a character to itself, then the source and target character should be the same. ` +        
-        `For each action, extract the 'name' of the action (no more than 2 words), ` +
-        `the source character (the character doing the action) and the target character (the character targetted by the action)`+
-        `, and the location of the action (you can use 'unknown' if the location cannot be inferred from the text).`
+
+        let prompt = actionsPrompt
+            .replace('{before}', this.textBefore.length === 0 ? "" : `BEFORE: ${this.textBefore}\n\n`)
+            .replace('{text}', `TEXT: ${this.textToExtract}\n\n`)
+            .replace('{after}', "")
+            .replace('{entities}', entitiesStr)
+            .replace('{locations}', locationsStr);
+
+        return prompt;
     }
 
     getJSONSchema(): z.ZodType<z.infer<typeof SCHEMA>> {

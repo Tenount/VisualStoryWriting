@@ -3,6 +3,7 @@ import { CreateEntityNode } from "../../../view/entityActionView/EntityNodeCompo
 import { LayoutUtils } from "../../LayoutUtils";
 import { EntityNode, useModelStore } from "../../Model";
 import { JSONPrompt } from "../utils/JSONPrompt";
+import entitiesPrompt from '../entities.md?raw';
 
 const ENTITY_SCHEMA = z.object({
     entities: z.array(z.object({
@@ -22,12 +23,7 @@ export function extractedEntitiesToNodeEntities(extractedData: z.infer<typeof EN
 
 
 export function EntitiesExtractor(text : string, center: {x: number, y: number}) : Promise<EntityNode[]> {
-    const prompt = text + 
-    `\n\nExtract all the entities in this story.` +
-    `For each entity, extract its 'name', an emoji best visually describing the entity (e.g., use the emoji of a person if it is a person but avoid reusing the same emojis),` +
-    `and properties about the entity, if any (no more than 3). ` + 
-    `Properties have to be adjectives describing the entity and their value should represent the intensity of the property (on a scale from 1 to 10).`
-
+    const prompt = entitiesPrompt.replace('{text}', text);
 
     const entityExtractor = new JSONPrompt({ prompt:  prompt}, ENTITY_SCHEMA)
     useModelStore.getState().setEntityNodes([]);
@@ -53,6 +49,6 @@ export function EntitiesExtractor(text : string, center: {x: number, y: number})
         entityExtractor.execute().then((result) => {
             console.log("Extracted entities:", result.result.entities);
             resolve(useModelStore.getState().entityNodes);
-    })
+        })
     });
 }
