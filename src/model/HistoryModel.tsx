@@ -33,9 +33,48 @@ interface HistoryModelAction {
 }
 
 function getInitialState() : HistoryModelState {
+    // Try to load history from localStorage
+    let historyTree: HistoryNodeDatum | null = null;
+    let positionInTree: number[] = [];
+    let lastSavedState: ModelState | null = null;
+    
+    try {
+        const saved = localStorage.getItem('visualStoryHistory');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            historyTree = parsed.historyTree;
+            positionInTree = parsed.positionInTree || [];
+            lastSavedState = parsed.lastSavedState || null;
+            
+            console.log("Loading from localStorage:", {
+                hasHistoryTree: !!historyTree,
+                positionInTree,
+                lastSavedStateTextLength: lastSavedState?.text?.length,
+                lastSavedStateEntityCount: lastSavedState?.entityNodes?.length,
+                lastSavedStateActionCount: lastSavedState?.actionEdges?.length
+            });
+            
+            // Restore the visual state from localStorage if available
+            if (lastSavedState && typeof window !== 'undefined') {
+                const { useModelStore } = require('./Model');
+                useModelStore.setState({
+                    entityNodes: lastSavedState.entityNodes || [],
+                    locationNodes: lastSavedState.locationNodes || [],
+                    actionEdges: lastSavedState.actionEdges || [],
+                    textState: lastSavedState.textState || [],
+                    text: lastSavedState.text || '',
+                    textActionMatches: lastSavedState.textActionMatches || [],
+                    isStale: false,
+                });
+            }
+        }
+    } catch (e) {
+        // Ignore localStorage errors
+    }
+    
     return {
-        historyTree: null,
-        positionInTree: [],
+        historyTree,
+        positionInTree,
         redoPositionStack: [],
         timestampLastAddedNode: 0
     }
@@ -48,6 +87,11 @@ export const useHistoryModelStore = create<HistoryModelState & HistoryModelActio
         // Restore the state
         const node = get().getNodeAtPosition(position);
         if (node) {
+            console.log("Restoring from history:", {
+                textLength: node.node.state.text?.length,
+                entityCount: node.node.state.entityNodes?.length,
+                actionCount: node.node.state.actionEdges?.length
+            });
             useModelStore.setState(node.node.state);
             // Make sure the editor is updated
             globalEditor.children = node.node.state.textState;
@@ -61,6 +105,20 @@ export const useHistoryModelStore = create<HistoryModelState & HistoryModelActio
             useStudyStore.getState().logEvent("SET_POSITION_IN_HISTORY_TREE", { position });
 
             set((state) => ({ positionInTree: position, redoPositionStack: [] }));
+            
+            // Save to localStorage
+            try {
+                const historyTree = get().historyTree;
+                if (historyTree) {
+                    localStorage.setItem('visualStoryHistory', JSON.stringify({
+                        historyTree,
+                        positionInTree: position,
+                        lastSavedState: useModelStore.getState()
+                    }));
+                }
+            } catch (e) {
+                // Ignore localStorage errors
+            }
         }
     },
     getNodeAtPosition: (position: number[]) => {
@@ -145,6 +203,17 @@ export const useHistoryModelStore = create<HistoryModelState & HistoryModelActio
             }
         }
         set((state) => ({ historyTree: JSON.parse(JSON.stringify(tree)), positionInTree: newPosition, redoPositionStack: [], timestampLastAddedNode: Date.now() }));
+        
+        // Save to localStorage
+        try {
+            localStorage.setItem('visualStoryHistory', JSON.stringify({
+                historyTree: tree,
+                positionInTree: newPosition,
+                lastSavedState: useModelStore.getState()
+            }));
+        } catch (e) {
+            // Ignore localStorage errors
+        }
     },
     undo: () => {
         const position = get().positionInTree;

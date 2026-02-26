@@ -101,8 +101,10 @@ export class VisualRefresher {
         // Only bother updating the sentences that were not already in the previous text
         sentences = sentences.filter((sentence) => !this.previousText.includes(sentence.text));
         
+        console.log("VisualRefresher: Total sentences to process:", sentences.length);
+        
         // Now we extract the actions from each sentences
-        const actionPromises = sentences.map((sentence) => {
+        const actionPromises = sentences.map((sentence, index) => {
             const entities = useModelStore.getState().entityNodes;
             const prompt = new SentenceActionsExtractor(entities, text.substring(0, sentence.start), sentence.text, text.substring(sentence.end, text.length));
             prompt.onUpdate = () => {
@@ -120,7 +122,11 @@ export class VisualRefresher {
             return;
         }
 
+        console.log("ParallelPrompts: Starting extraction for", actionPromises.length, "sentences");
+        
         new ParallelPrompts(actionPromises).execute().then((results) => {
+            console.log("ParallelPrompts: Finished, got", results.length, "results");
+            
             const actions = useModelStore.getState().actionEdges.map((actionEdge) => {
                 const sourceEntity = useModelStore.getState().entityNodes.find(entity => entity.id === actionEdge.source);
                 const targetEntity = useModelStore.getState().entityNodes.find(entity => entity.id === actionEdge.target);

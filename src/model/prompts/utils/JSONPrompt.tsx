@@ -80,6 +80,7 @@ export class JSONPrompt<T> extends BasePrompt<PromptResult<T>> {
           return;
         }
 
+        try {
         useStudyStore.getState().logEvent("PROMPT_TO_EXECUTE", { prompt: this.prompt.prompt });
         const { openAIModel, openAITemperature } = useModelStore.getState();
         const stream = await openai.chat.completions.create({
@@ -116,6 +117,10 @@ export class JSONPrompt<T> extends BasePrompt<PromptResult<T>> {
             reject(new Error("Failed to parse model response as JSON"));
           }
         }
+      } catch (error) {
+        console.error("LLM API error:", error);
+        reject(error);
+      }
       })();
     });
   }
