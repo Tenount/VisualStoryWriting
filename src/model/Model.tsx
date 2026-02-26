@@ -148,10 +148,14 @@ interface ModelAction {
 
 
 function getInitialState() {
+    // Try to load text from localStorage
+    const savedText = typeof window !== 'undefined' ? localStorage.getItem('visualStoryText') : null;
+    const initialText = savedText || hardcodedText;
+    
     const initialTextState = [
         {
             children: [{
-                text: hardcodedText }]
+                text: initialText }]
         },
     ]
 
@@ -247,6 +251,13 @@ export const useModelStore = create<ModelState & ModelAction>()((set, get) => ({
             // Update the text and the position of the actions in the text (at least do it as best it can)
             const textActionMatches = TextUtils.matchActionsToText(get().actionEdges.map((edge) => edge.data!), text);
             set((state) => ({ textState: textState, text: text, textActionMatches: textActionMatches, isStale: true }));
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem('visualStoryText', text);
+            } catch (e) {
+                // Ignore localStorage errors
+            }
 
             if (addHistoryNode) useHistoryModelStore.getState().addHistoryNode(get());
         } else {

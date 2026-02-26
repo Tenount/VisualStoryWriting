@@ -50,6 +50,22 @@ export class VisualRefresher {
         useModelStore.getState().setLocationNodes(newLocationNodes);
     }
 
+    removeEntitiesWithoutConnections() {
+        const entityNodes = useModelStore.getState().entityNodes;
+        const actionEdges = useModelStore.getState().actionEdges;
+        
+        // Find all entity IDs that have at least one connection
+        const connectedEntityIds = new Set<string>();
+        for (const edge of actionEdges) {
+            connectedEntityIds.add(edge.source);
+            connectedEntityIds.add(edge.target);
+        }
+        
+        // Keep only entities that have at least one connection
+        const newEntityNodes = entityNodes.filter((entityNode) => connectedEntityIds.has(entityNode.id));
+        useModelStore.getState().setEntityNodes(newEntityNodes);
+    }
+
     refreshFromText(text: string, onUpdate?: () => void, onFinished?: () => void) {
         if (this.previousText === text) return;
 
@@ -111,6 +127,9 @@ export class VisualRefresher {
                 return {name: actionEdge.data?.name, source: sourceEntity?.data.name, target: targetEntity?.data.name, location: actionEdge.data?.sourceLocation, passage: actionEdge.data?.passage}
             });
             console.log("Extracted actions:", actions);
+            
+            // Remove entities without connections
+            this.removeEntitiesWithoutConnections();
             
             if (onFinished) onFinished();
             this.onRefreshDone();
