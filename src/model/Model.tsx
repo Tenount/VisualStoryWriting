@@ -38,12 +38,9 @@ if (import.meta.env.OPENAI_TEMPERATURE !== undefined) {
 
 // Read key from URL if present, otherwise from env
 if (key) {
-    console.log("Key in URL, using it");
     openaiKey = atob(key);
 } else {
-    console.log("No key in URL, checking .env");
     const envKey = import.meta.env.OPENAI_API_KEY;
-    console.log("env vars:", { envKey: !!envKey, envBaseUrl, envModel });
     if (envKey) {
         openaiKey = envKey;
     }
@@ -331,8 +328,5 @@ export const useModelStore = create<ModelState & ModelAction>()((set, get) => ({
     setIsReadOnly: (isReadOnly) => {
         set((state) => ({ isReadOnly: isReadOnly }));
     },
-    setIsExtracting: (isExtracting) => {
-        console.log("setIsExtracting called:", isExtracting);
-        set((state) => ({ isExtracting: isExtracting }));
-    }
+    setIsExtracting: (isExtracting) => set((state) => ({ isExtracting }))
 }))
